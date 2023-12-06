@@ -15,6 +15,7 @@ library
     exposed-modules:
         Models.Speciality
         Models.Program
+        Models.Semester
         Modules.File
         Modules.ReadDB
         Modules.Search
@@ -23,6 +24,7 @@ library
         TBUI.Menus.StartMenu
         TBUI.Menus.SpecialityMenu
         TBUI.Menus.ProgramMenu
+        TBUI.Menus.SemesterMenu
     build-depends:
         base ^>=4.12.0.0,
         ansi-terminal,
