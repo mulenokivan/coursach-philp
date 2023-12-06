@@ -24,7 +24,7 @@ module TBUI.Menus.ProgramMenu (
 
   programMenu :: IO (String)
   programMenu = do
-    printHeader "Направления подготовки"
+    printHeader "Учебные планы"
 
     contents <- customReadFile _DB_PROGRAM_FILE_NAME
     let linesOfFile = lines contents

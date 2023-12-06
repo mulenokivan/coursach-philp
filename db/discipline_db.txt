@@ -1,0 +1,5 @@
+Discipline 1 "Индустриальная разработка" 1
+Discipline 2 "Индустриальная жопа" 1
+Discipline 3 "пвыолпвыождл" 5
+Discipline 4 "рпфывдшжпы" 5
+Discipline 5 "Математика" 2

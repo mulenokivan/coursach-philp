@@ -24,7 +24,7 @@ module TBUI.Menus.SemesterMenu (
 
   semesterMenu :: IO (String)
   semesterMenu = do
-    printHeader "Направления подготовки"
+    printHeader "Семестры"
 
     contents <- customReadFile _DB_SEMESTER_FILE_NAME
     let linesOfFile = lines contents
@@ -36,7 +36,7 @@ module TBUI.Menus.SemesterMenu (
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
-      "Чтобы создать направление подготовки, напишите: 'Create <номер> <id учебного плана>' "
+      "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' "
       ]
 
     input <- getLine

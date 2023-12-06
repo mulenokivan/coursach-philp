@@ -6,6 +6,7 @@ module TBUI.Routes (
   import TBUI.Menus.SpecialityMenu (specialityMenu)
   import TBUI.Menus.ProgramMenu (programMenu)
   import TBUI.Menus.SemesterMenu (semesterMenu)
+  import TBUI.Menus.DisciplineMenu (disciplineMenu)
 
   routes :: String -> IO ()
   routes route = do
@@ -25,6 +26,10 @@ module TBUI.Routes (
       "SemesterMenu" -> do
         clearScreen
         newRoute <- semesterMenu
+        routes newRoute
+      "DisciplineMenu" -> do
+        clearScreen
+        newRoute <- disciplineMenu
         routes newRoute
       "Exit" -> do
         putStrLn "Выход"
