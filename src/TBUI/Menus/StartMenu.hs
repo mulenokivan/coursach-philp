@@ -17,7 +17,8 @@ module TBUI.Menus.StartMenu (
 
     let options = [
           ("[1] Направления подготовки", "SpecialityMenu"),
-          ("[2] Выйти", "Exit")
+          ("[2] Учебные планы", "ProgramMenu"),
+          ("[3] Выйти", "Exit")
           ]
     printOptions options
 

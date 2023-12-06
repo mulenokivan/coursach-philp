@@ -4,6 +4,7 @@ module TBUI.Routes (
   import TBUI.Tools (clearScreen)
   import TBUI.Menus.StartMenu (startMenu)
   import TBUI.Menus.SpecialityMenu (specialityMenu)
+  import TBUI.Menus.ProgramMenu (programMenu)
 
   routes :: String -> IO ()
   routes route = do
@@ -15,6 +16,10 @@ module TBUI.Routes (
       "SpecialityMenu" -> do
         clearScreen
         newRoute <- specialityMenu
+        routes newRoute
+      "ProgramMenu" -> do
+        clearScreen
+        newRoute <- programMenu
         routes newRoute
       "Exit" -> do
         putStrLn "Выход"

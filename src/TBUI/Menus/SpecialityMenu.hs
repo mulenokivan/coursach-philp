@@ -35,7 +35,7 @@ module TBUI.Menus.SpecialityMenu (
       ) specialityList
 
     printNoticeList [
-      "Чтобы выйти в главное меню, напишите: 'Exit'",
+      "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать направление подготовки, напишите: 'Create <название> <код>' "
       ]
 
@@ -44,7 +44,7 @@ module TBUI.Menus.SpecialityMenu (
 
   stringOperations :: String -> [String] -> [Speciality] -> IO (String)
   stringOperations inputValue linesOfFile specialityList
-    | (findSubStrIdx inputValue "Exit" 0 /= Nothing) = do
+    | (findSubStrIdx inputValue "Back" 0 /= Nothing) = do
       return "StartMenu"
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, codeString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
