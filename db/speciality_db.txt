@@ -1,0 +1,3 @@
+Speciality 1 "Программная инженерия" "09.03.04"
+Speciality 2 "asd ASD" "asdasd ddd"
+Speciality 3 "Дада" "021.412"
