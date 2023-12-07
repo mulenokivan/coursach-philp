@@ -26,7 +26,7 @@ module TBUI.Routes (
         routes newRoute
       "SemesterMenu" -> do
         clearScreen
-        newRoute <- semesterMenu
+        newRoute <- semesterMenu 1
         routes newRoute
       "DisciplineMenu" -> do
         clearScreen

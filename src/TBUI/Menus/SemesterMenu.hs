@@ -22,28 +22,48 @@ module TBUI.Menus.SemesterMenu (
   _PAGINATE_PER :: Int
   _PAGINATE_PER = 6
 
-  semesterMenu :: IO (String)
-  semesterMenu = do
+  semesterMenu :: Int -> IO (String)
+  semesterMenu pageNumber = do
     printHeader "Семестры"
 
     contents <- customReadFile _DB_SEMESTER_FILE_NAME
     let linesOfFile = lines contents
     let semesterList = createSemesterList linesOfFile []
 
+    let filteredSemesterList = take _PAGINATE_PER (drop ((pageNumber - 1) * _PAGINATE_PER) semesterList)
+
     mapM_ (\semester -> do
         printSemester semester
-      ) semesterList
+      ) filteredSemesterList
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' "
       ]
 
-    input <- getLine
-    stringOperations input linesOfFile semesterList
+    let pageCount = ceiling (fromIntegral (length semesterList) / fromIntegral _PAGINATE_PER)
+    printPagination pageNumber pageCount
 
-  stringOperations :: String -> [String] -> [Semester] -> IO (String)
-  stringOperations inputValue linesOfFile semesterList
+    input <- getLine
+    if (all isDigit input)
+      then do
+        let index = read input :: Int
+        digitOperations index pageCount pageNumber
+      else do
+        stringOperations input linesOfFile semesterList pageNumber
+
+  digitOperations :: Int -> Int -> Int -> IO (String)
+  digitOperations index pageCount pageNumber
+    | (index <= pageCount) = do
+      clearScreen
+      semesterMenu index
+    | otherwise = do
+      clearScreen
+      printError "Выход за пределы пагинации"
+      semesterMenu pageNumber
+
+  stringOperations :: String -> [String] -> [Semester] -> Int -> IO (String)
+  stringOperations inputValue linesOfFile semesterList pageNumber
     | (findSubStrIdx inputValue "Back" 0 /= Nothing) = do
       return "StartMenu"
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
@@ -52,7 +72,7 @@ module TBUI.Menus.SemesterMenu (
       return "StartMenu"
     | otherwise = do
       clearScreen
-      semesterMenu
+      semesterMenu pageNumber
 
   createSemester :: String -> String -> IO ()
   createSemester semesterTitle semesterSpecialityId = do
