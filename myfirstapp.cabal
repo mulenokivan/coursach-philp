@@ -17,6 +17,7 @@ library
         Models.Program
         Models.Semester
         Models.Discipline
+        Models.Loading
         Modules.File
         Modules.ReadDB
         Modules.Search
@@ -27,6 +28,7 @@ library
         TBUI.Menus.ProgramMenu
         TBUI.Menus.SemesterMenu
         TBUI.Menus.DisciplineMenu
+        TBUI.Menus.LoadingMenu
     build-depends:
         base ^>=4.12.0.0,
         ansi-terminal,

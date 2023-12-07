@@ -20,7 +20,8 @@ module TBUI.Menus.StartMenu (
           ("[2] Учебные планы", "ProgramMenu"),
           ("[3] Семестры", "SemesterMenu"),
           ("[4] Дисциплины", "DisciplineMenu"),
-          ("[5] Выйти", "Exit")
+          ("[5] Нагрузки", "LoadingMenu"),
+          ("[6] Выйти", "Exit")
           ]
     printOptions options
 
