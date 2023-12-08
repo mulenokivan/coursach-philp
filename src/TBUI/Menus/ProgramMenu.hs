@@ -22,7 +22,7 @@ module TBUI.Menus.ProgramMenu (
   _PAGINATE_PER :: Int
   _PAGINATE_PER = 6
 
-  programMenu :: IO (String)
+  programMenu :: IO (String, Integer)
   programMenu = do
     printHeader "Учебные планы"
 
@@ -35,21 +35,24 @@ module TBUI.Menus.ProgramMenu (
       ) programList
 
     printNoticeList [
-      "Чтобы выйти в главное меню, напишите: 'Back'",
+      "[1] Главное меню",
       "Чтобы создать учебный план, напишите: 'Create <название> <id направления подготовки>' "
       ]
 
     input <- getLine
     stringOperations input linesOfFile programList
 
-  stringOperations :: String -> [String] -> [Program] -> IO (String)
+  stringOperations :: String -> [String] -> [Program] -> IO (String, Integer)
   stringOperations inputValue linesOfFile programList
-    | (findSubStrIdx inputValue "Back" 0 /= Nothing) = do
-      return "StartMenu"
+    | (findSubStrIdx inputValue "[1]" 0 /= Nothing) = do
+      return ("StartMenu", 1)
+    | (findSubStrIdx inputValue "Goto" 0 /= Nothing) = do
+      let [_, id] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      return ("ProgramInnerMenu", read id :: Integer)
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, specialityIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createProgram titleString specialityIdString
-      return "StartMenu"
+      return ("StartMenu", 1)
     | otherwise = do
       clearScreen
       programMenu

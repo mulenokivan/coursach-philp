@@ -30,37 +30,44 @@ module TBUI.Menus.SemesterMenu (
     let linesOfFile = lines contents
     let semesterList = createSemesterList linesOfFile []
 
-    let filteredSemesterList = take _PAGINATE_PER (drop ((pageNumber - 1) * _PAGINATE_PER) semesterList)
+    -- let filteredSemesterList = take _PAGINATE_PER (drop ((pageNumber - 1) * _PAGINATE_PER) semesterList)
+    -- mapM_ (\semester -> do
+        -- printSemester semester
+      -- ) filteredSemesterList
 
     mapM_ (\semester -> do
         printSemester semester
-      ) filteredSemesterList
+      ) semesterList
+
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' "
       ]
 
-    let pageCount = ceiling (fromIntegral (length semesterList) / fromIntegral _PAGINATE_PER)
-    printPagination pageNumber pageCount
+    -- let pageCount = ceiling (fromIntegral (length semesterList) / fromIntegral _PAGINATE_PER)
+    -- printPagination pageNumber pageCount
+
+    -- input <- getLine
+    -- if (all isDigit input)
+      -- then do
+        -- let index = read input :: Int
+        -- digitOperations index pageCount pageNumber
+      -- else do
+        -- stringOperations input linesOfFile semesterList pageNumber
 
     input <- getLine
-    if (all isDigit input)
-      then do
-        let index = read input :: Int
-        digitOperations index pageCount pageNumber
-      else do
-        stringOperations input linesOfFile semesterList pageNumber
+    stringOperations input linesOfFile semesterList 0
 
-  digitOperations :: Int -> Int -> Int -> IO (String)
-  digitOperations index pageCount pageNumber
-    | (index <= pageCount) = do
-      clearScreen
-      semesterMenu index
-    | otherwise = do
-      clearScreen
-      printError "Выход за пределы пагинации"
-      semesterMenu pageNumber
+  -- digitOperations :: Int -> Int -> Int -> IO (String)
+  -- digitOperations index pageCount pageNumber
+    -- | (index <= pageCount) = do
+      -- clearScreen
+      -- semesterMenu index
+    -- | otherwise = do
+      -- clearScreen
+      -- printError "Выход за пределы пагинации"
+      -- semesterMenu pageNumber
 
   stringOperations :: String -> [String] -> [Semester] -> Int -> IO (String)
   stringOperations inputValue linesOfFile semesterList pageNumber

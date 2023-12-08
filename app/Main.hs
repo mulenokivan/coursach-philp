@@ -4,4 +4,4 @@ import TBUI.Routes (routes)
 
 main :: IO ()
 main = do
-  routes "StartMenu"
+  routes ("StartMenu", 0)

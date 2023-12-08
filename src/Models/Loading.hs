@@ -6,10 +6,11 @@ module Models.Loading (
   deleteLoading,
   createLoadingList,
   getLoadingId,
-  getLoadingTitle,
+  getLoadingHours,
   getLoadingDisciplineId,
   getLoadingSemesterId,
   getLoadingKind,
+  getLoadingSemesterIdAndDisciplineId,
   ifLoadingFileExist,
   printLoading
 ) where
@@ -73,14 +74,17 @@ module Models.Loading (
   getLoadingId :: Loading -> Integer
   getLoadingId (Loading id _ _ _ _) = id
 
-  getLoadingTitle :: Loading -> Integer
-  getLoadingTitle (Loading _ hours _ _ _) = hours
+  getLoadingHours :: Loading -> Integer
+  getLoadingHours (Loading _ hours _ _ _) = hours
 
   getLoadingDisciplineId :: Loading -> Integer
   getLoadingDisciplineId (Loading _ _ discipline_id _ _) = discipline_id
 
   getLoadingSemesterId :: Loading -> Integer
   getLoadingSemesterId (Loading _ _ _ semester_id _) = semester_id
+
+  getLoadingSemesterIdAndDisciplineId :: Loading -> [Integer]
+  getLoadingSemesterIdAndDisciplineId (Loading _ _ discipline_id semester_id _) = [discipline_id, semester_id]
 
   getLoadingKind :: Loading -> String
   getLoadingKind (Loading _ _ _ _ kind) = kind

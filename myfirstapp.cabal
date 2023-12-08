@@ -26,6 +26,7 @@ library
         TBUI.Menus.StartMenu
         TBUI.Menus.SpecialityMenu
         TBUI.Menus.ProgramMenu
+        TBUI.Menus.ProgramInnerMenu
         TBUI.Menus.SemesterMenu
         TBUI.Menus.DisciplineMenu
         TBUI.Menus.LoadingMenu
