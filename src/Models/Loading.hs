@@ -33,7 +33,7 @@ module Models.Loading (
 
   instance Show Loading where
     show (Loading id hours discipline_id semester_id kind) =
-      "Loading " ++ show hours ++ " " ++ show discipline_id ++ " " ++ show semester_id ++ " " ++ show kind
+      "Loading " ++ show id ++ " " ++ show hours ++ " " ++ show discipline_id ++ " " ++ show semester_id ++ " " ++ show kind
 
   -- CONSTANTS
   _DB_LOADING_FILE_NAME :: String
@@ -68,7 +68,7 @@ module Models.Loading (
 
   -- PRINT
   printLoading :: Loading -> IO ()
-  printLoading (Loading id hours disciplineId semesterId kindString) = putStrLn (show hours ++ " " ++ show disciplineId ++ " " ++ show semesterId ++ " " ++ kindString )
+  printLoading (Loading id hours disciplineId semesterId kindString) = putStrLn (show id ++ " " ++ show hours ++ " " ++ show disciplineId ++ " " ++ show semesterId ++ " " ++ kindString )
 
   -- GETTERS
   getLoadingId :: Loading -> Integer

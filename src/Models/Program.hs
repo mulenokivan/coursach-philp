@@ -61,7 +61,7 @@ module Models.Program (
 
   -- PRINT
   printProgram :: Program -> IO ()
-  printProgram (Program id title specialityId) = putStrLn (title ++ " " ++ show specialityId)
+  printProgram (Program id title specialityId) = putStrLn (show id ++  " " ++ title ++ " " ++ show specialityId)
 
   -- GETTERS
   getProgramId :: Program -> Integer

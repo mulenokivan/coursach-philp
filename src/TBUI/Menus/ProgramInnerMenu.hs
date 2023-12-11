@@ -5,9 +5,8 @@ module TBUI.Menus.ProgramInnerMenu (
   import Text.Read (readMaybe)
   import Data.Maybe (fromJust)
   import Data.Char (isDigit)
-  import Data.List (maximumBy, intercalate)
+  import Data.List
   import qualified System.Console.ANSI as ANSI
-
   -- MODELS
   import Models.Program
   import Models.Discipline
@@ -52,14 +51,21 @@ module TBUI.Menus.ProgramInnerMenu (
         putStrLn (show semesterNumber ++ " Семестр")
         let semesterId = getSemesterId semester
         let loadings = findLoadingsBySemesterId wholeLoadingList semesterId
-        mapM_ (\loading -> do
-            let loadingId = getLoadingDisciplineId loading
-            let discipline = findDisciplineById disciplineListByProgramId loadingId
+        let disciplineIds = nub (map getLoadingDisciplineId loadings)
+        mapM_ (\disciplineId -> do
+            let discipline = findDisciplineById disciplineListByProgramId disciplineId
             let disciplineTitle = getDisciplineTitle discipline
-            let loadingHours = getLoadingHours loading
-            let loadingKind = getLoadingKind loading
-            putStrLn ("         " ++ disciplineTitle ++ " " ++ show loadingHours ++ " " ++ loadingKind)
-          ) loadings
+            let disciplineLoadingHours = sum (map getLoadingHours (findLoadingsByDisciplineId loadings disciplineId))
+            putStrLn ("         " ++ disciplineTitle ++ " " ++ show disciplineLoadingHours ++ " ч.")
+          ) disciplineIds
+        -- mapM_ (\loading -> do
+        --     let loadingId = getLoadingDisciplineId loading
+        --     let discipline = findDisciplineById disciplineListByProgramId loadingId
+        --     let disciplineTitle = getDisciplineTitle discipline
+        --     let loadingHours = getLoadingHours loading
+        --     let loadingKind = getLoadingKind loading
+        --     putStrLn ("         " ++ disciplineTitle ++ " " ++ show loadingHours ++ " " ++ loadingKind)
+        --   ) loadings
       ) semesterListByProgramId
 
     printNoticeList [
@@ -68,12 +74,6 @@ module TBUI.Menus.ProgramInnerMenu (
 
     input <- getLine
     stringOperations input linesOfFile programList id
-
-  -- findLoadingsBySemesterIdAndDisciplineId :: [Loading] -> [Integer] -> [Loading]
-  -- findLoadingsBySemesterIdAndDisciplineId [] _ = []
-  -- findLoadingsBySemesterIdAndDisciplineId (x:xs) programId
-  --   | (getLoadingProgramIdAndDisciplineId x == programId) = x : findDisciplinesByProgramId xs programId
-  --   | otherwise = findDisciplinesByProgramId xs programId
 
   stringOperations :: String -> [String] -> [Program] -> Integer -> IO (String, Integer)
   stringOperations inputValue linesOfFile programList id

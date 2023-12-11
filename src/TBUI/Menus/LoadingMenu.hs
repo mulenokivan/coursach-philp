@@ -24,7 +24,7 @@ module TBUI.Menus.LoadingMenu (
 
   loadingMenu :: IO (String)
   loadingMenu = do
-    printHeader "Нагрузки"
+    printHeader "Нагрузки [<id> <часы> <id дисциплины> <id семестра> <тип>]"
 
     contents <- customReadFile _DB_LOADING_FILE_NAME
     let linesOfFile = lines contents

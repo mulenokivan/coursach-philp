@@ -24,7 +24,7 @@ module TBUI.Menus.SpecialityMenu (
 
   specialityMenu :: IO (String)
   specialityMenu = do
-    printHeader "Направления подготовки"
+    printHeader "Направления подготовки [<id> <название> <код>]"
 
     contents <- customReadFile _DB_SPECIALITY_FILE_NAME
     let linesOfFile = lines contents

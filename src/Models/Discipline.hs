@@ -28,7 +28,7 @@ module Models.Discipline (
 
   instance Show Discipline where
     show (Discipline id title program_id) =
-      "Discipline " ++ show title ++ " " ++ show program_id
+      "Discipline " ++ show id ++ " " ++ show title ++ " " ++ show program_id
 
   -- CONSTANTS
   _DB_DISCIPLINE_FILE_NAME :: String
@@ -61,7 +61,7 @@ module Models.Discipline (
 
   -- PRINT
   printDiscipline :: Discipline -> IO ()
-  printDiscipline (Discipline id title programId) = putStrLn (title ++ " " ++ show programId)
+  printDiscipline (Discipline id title programId) = putStrLn (show id ++ " " ++ title ++ " " ++ show programId)
 
   -- GETTERS
   getDisciplineId :: Discipline -> Integer

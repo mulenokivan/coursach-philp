@@ -28,7 +28,7 @@ module Models.Semester (
 
   instance Show Semester where
     show (Semester id number program_id) =
-      "Semester " ++ show number ++ " " ++ show program_id
+      "Semester " ++ show id ++ " " ++ show number ++ " " ++ show program_id
 
   -- CONSTANTS
   _DB_SEMESTER_FILE_NAME :: String
@@ -62,7 +62,7 @@ module Models.Semester (
 
   -- PRINT
   printSemester :: Semester -> IO ()
-  printSemester (Semester id number programId) = putStrLn (show number ++ " " ++ show programId)
+  printSemester (Semester id number programId) = putStrLn (show id ++ " " ++ show number ++ " " ++ show programId)
 
   -- GETTERS
   getSemesterId :: Semester -> Integer

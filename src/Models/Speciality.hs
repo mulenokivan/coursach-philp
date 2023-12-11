@@ -28,7 +28,7 @@ module Models.Speciality (
 
   instance Show Speciality where
     show (Speciality id title code) =
-      "Speciality " ++ show title ++ " " ++ show code
+      "Speciality " ++ show id ++ " " ++ show title ++ " " ++ show code
 
   -- CONSTANTS
   _DB_SPECIALITY_FILE_NAME :: String
@@ -60,7 +60,7 @@ module Models.Speciality (
 
   -- PRINT
   printSpeciality :: Speciality -> IO ()
-  printSpeciality (Speciality id title code) = putStrLn (title ++ " " ++ code)
+  printSpeciality (Speciality id title code) = putStrLn (show id ++ " " ++ title ++ " " ++ code)
 
   -- GETTERS
   getSpecialityId :: Speciality -> Integer
