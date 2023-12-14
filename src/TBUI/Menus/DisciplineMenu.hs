@@ -10,6 +10,7 @@ module TBUI.Menus.DisciplineMenu (
 
   -- MODELS
   import Models.Discipline
+  import Models.Program
 
   -- MODULES
   import Modules.File
@@ -49,15 +50,27 @@ module TBUI.Menus.DisciplineMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, programIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createDiscipline titleString programIdString
-      return "StartMenu"
+      disciplineMenu
     | otherwise = do
       clearScreen
       disciplineMenu
 
   createDiscipline :: String -> String -> IO ()
   createDiscipline disciplineTitle disciplineProgramId = do
-    contents <- customReadFile _DB_DISCIPLINE_FILE_NAME
-    let linesOfFile = lines contents
-    let disciplineList = createDisciplineList linesOfFile []
-    let disciplineId = show (getDisciplineId (maximumBy (\a b -> compare (getDisciplineId a) (getDisciplineId b)) disciplineList) + 1)
-    customWriteFile _DB_DISCIPLINE_FILE_NAME _DB_DISCIPLINE_TEMP_FILE_NAME (unlines (linesOfFile ++ ["Discipline " ++ disciplineId ++ " \"" ++ disciplineTitle ++ "\" " ++ disciplineProgramId]))
+    disciplineContents <- customReadFile _DB_DISCIPLINE_FILE_NAME
+    let disciplineLinesOfFile = lines disciplineContents
+    let disciplineList = createDisciplineList disciplineLinesOfFile []
+
+    programContents <- customReadFile _DB_PROGRAM_FILE_NAME
+    let programLinesOfFile = lines programContents
+    let programList = filter (\p -> getProgramId p == (read disciplineProgramId :: Integer)) (createProgramList programLinesOfFile [])
+
+    let firstError = if null programList then "Нельзя привязать дисциплину к несуществующему учебному плану" else ""
+    let errorMessages = filter (not . null) [firstError]
+    if null errorMessages
+      then do
+        let disciplineId = show (getDisciplineId (maximumBy (\a b -> compare (getDisciplineId a) (getDisciplineId b)) disciplineList) + 1)
+        customWriteFile _DB_DISCIPLINE_FILE_NAME _DB_DISCIPLINE_TEMP_FILE_NAME (unlines (disciplineLinesOfFile ++ ["Discipline " ++ disciplineId ++ " \"" ++ disciplineTitle ++ "\" " ++ disciplineProgramId]))
+        putStrLn $ "Дисциплина " ++ disciplineTitle ++ " была создана."
+      else do
+        mapM_ printError errorMessages

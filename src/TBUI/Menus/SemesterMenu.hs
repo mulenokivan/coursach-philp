@@ -60,14 +60,14 @@ module TBUI.Menus.SemesterMenu (
   createSemester :: String -> String -> IO ()
   createSemester semesterNumber semesterProgramId = do
     semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
-    let linesOfFile = lines semesterContents
-    let semesterList = createSemesterList linesOfFile []
+    let semesterLinesOfFile = lines semesterContents
+    let semesterList = createSemesterList semesterLinesOfFile []
     let semesterListByProgramId = filter (\s -> getSemesterProgramId s == (read semesterProgramId :: Integer)) semesterList
     let semesterListByProgramIdByNumber = filter (\s -> getSemesterNumber s == (read semesterNumber :: Integer)) semesterListByProgramId
 
     programContents <- customReadFile _DB_PROGRAM_FILE_NAME
-    let linesOfFile = lines programContents
-    let programList = filter (\p -> getProgramId p == (read semesterProgramId :: Integer)) (createProgramList linesOfFile [])
+    let programLinesOfFile = lines programContents
+    let programList = filter (\p -> getProgramId p == (read semesterProgramId :: Integer)) (createProgramList programLinesOfFile [])
 
     let firstError = if length semesterListByProgramId >= 8 then "Нельзя создать больше 8 семестров в учебном плане!!!" else ""
     let secondError = if (read semesterNumber :: Integer) > 8 then "Номер семестра не может превосходить 8!!!" else ""
@@ -77,7 +77,7 @@ module TBUI.Menus.SemesterMenu (
     if null errorMessages
       then do
         let semesterId = show (getSemesterId (maximumBy (\a b -> compare (getSemesterId a) (getSemesterId b)) semesterList) + 1)
-        customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME (unlines (linesOfFile ++ ["Semester " ++ semesterId ++ " " ++ semesterNumber ++ " " ++ semesterProgramId]))
+        customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME (unlines (semesterLinesOfFile ++ ["Semester " ++ semesterId ++ " " ++ semesterNumber ++ " " ++ semesterProgramId]))
         putStrLn $ "Семестр " ++ semesterNumber ++ " был создан."
       else do
         mapM_ printError errorMessages
