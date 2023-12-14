@@ -10,6 +10,8 @@ module TBUI.Menus.LoadingMenu (
 
   -- MODELS
   import Models.Loading
+  import Models.Semester
+  import Models.Program
 
   -- MODULES
   import Modules.File
@@ -49,15 +51,38 @@ module TBUI.Menus.LoadingMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, hoursString, disciplineIdString, semesterIdString, kindString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createLoading hoursString disciplineIdString semesterIdString kindString
-      return "StartMenu"
+      loadingMenu
     | otherwise = do
       clearScreen
       loadingMenu
 
   createLoading :: String -> String -> String -> String -> IO ()
   createLoading loadingHours loadingDisciplineId loadingSemesterId loadingKind = do
-    contents <- customReadFile _DB_LOADING_FILE_NAME
-    let linesOfFile = lines contents
-    let loadingList = createLoadingList linesOfFile []
-    let loadingId = show (getLoadingId (maximumBy (\a b -> compare (getLoadingId a) (getLoadingId b)) loadingList) + 1)
-    customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME (unlines (linesOfFile ++ ["Loading " ++ loadingId ++ " " ++ loadingHours ++ " " ++ loadingDisciplineId ++ " " ++ loadingSemesterId ++ " \"" ++ loadingKind ++ "\""]))
+
+    loadingContents <- customReadFile _DB_LOADING_FILE_NAME
+    let loadingLinesOfFile = lines loadingContents
+    let loadingList = createLoadingList loadingLinesOfFile []
+
+    semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
+    let semesterLinesOfFile = lines semesterContents
+    let semesterList = createSemesterList semesterLinesOfFile []
+    let semesterByLoadingId = head (filter (\s -> getSemesterId s == (read loadingSemesterId :: Integer)) semesterList)
+
+    programContents <- customReadFile _DB_PROGRAM_FILE_NAME
+    let programLinesOfFile = lines programContents
+    let program = head (filter (\p -> getProgramId p == getSemesterProgramId semesterByLoadingId) (createProgramList programLinesOfFile []))
+
+    let semesterListByProgramId = filter (\s -> getSemesterProgramId s == getProgramId program) semesterList
+    let loadingListByProgramId = (\semester -> filter (\l -> getSemesterId semester == getLoadingSemesterId l) loadingList) =<< semesterListByProgramId
+    let loadingHoursSumByProgramId = sum (map getLoadingHours loadingListByProgramId)
+
+    let firstError = if (loadingHoursSumByProgramId + read loadingHours :: Integer) >= 240 then "Аяйяяй!" else ""
+
+    let errorMessages = filter (not . null) [firstError]
+    if null errorMessages
+      then do
+        let loadingId = show (getLoadingId (maximumBy (\a b -> compare (getLoadingId a) (getLoadingId b)) loadingList) + 1)
+        customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME (unlines (loadingLinesOfFile ++ ["Loading " ++ loadingId ++ " " ++ loadingHours ++ " " ++ loadingDisciplineId ++ " " ++ loadingSemesterId ++ " \"" ++ loadingKind ++ "\""]))
+        putStrLn $ "Нагрузка " ++ loadingId ++ " была создана."
+      else do
+        mapM_ printError errorMessages
