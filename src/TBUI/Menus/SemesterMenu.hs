@@ -11,6 +11,7 @@ module TBUI.Menus.SemesterMenu (
 
   -- MODELS
   import Models.Semester
+  import Models.Program
 
   -- MODULES
   import Modules.File
@@ -58,15 +59,21 @@ module TBUI.Menus.SemesterMenu (
 
   createSemester :: String -> String -> IO ()
   createSemester semesterNumber semesterProgramId = do
-    contents <- customReadFile _DB_SEMESTER_FILE_NAME
-    let linesOfFile = lines contents
+    semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
+    let linesOfFile = lines semesterContents
     let semesterList = createSemesterList linesOfFile []
     let semesterListByProgramId = filter (\s -> getSemesterProgramId s == (read semesterProgramId :: Integer)) semesterList
     let semesterListByProgramIdByNumber = filter (\s -> getSemesterNumber s == (read semesterNumber :: Integer)) semesterListByProgramId
+
+    programContents <- customReadFile _DB_PROGRAM_FILE_NAME
+    let linesOfFile = lines programContents
+    let programList = filter (\p -> getProgramId p == (read semesterProgramId :: Integer)) (createProgramList linesOfFile [])
+
     let firstError = if length semesterListByProgramId >= 8 then "Нельзя создать больше 8 семестров в учебном плане!!!" else ""
     let secondError = if (read semesterNumber :: Integer) > 8 then "Номер семестра не может превосходить 8!!!" else ""
     let thirdError = if not (null semesterListByProgramIdByNumber) then "Нельзя создать два семестра с одинаковым номером в одном учебном плане!!!" else ""
-    let errorMessages = filter (not . null) [firstError, secondError, thirdError]
+    let fourthError = if null programList then "Нельзя привязать семестр к несуществующему учебному плану" else ""
+    let errorMessages = filter (not . null) [firstError, secondError, thirdError, fourthError]
     if null errorMessages
       then do
         let semesterId = show (getSemesterId (maximumBy (\a b -> compare (getSemesterId a) (getSemesterId b)) semesterList) + 1)
