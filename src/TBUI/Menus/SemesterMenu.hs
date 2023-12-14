@@ -2,7 +2,8 @@ module TBUI.Menus.SemesterMenu (
   semesterMenu
 ) where
   -- LIBRARIES
-  import Text.Read (readMaybe)
+  -- LIBRARIES
+  import Text.Read (readMaybe, Lexeme (String))
   import Data.Maybe (fromJust)
   import Data.Char (isDigit)
   import Data.List (maximumBy, intercalate)
@@ -48,17 +49,28 @@ module TBUI.Menus.SemesterMenu (
     | (findSubStrIdx inputValue "Back" 0 /= Nothing) = do
       return "StartMenu"
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
-      let [_, titleString, specialityIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
-      createSemester titleString specialityIdString
-      return "StartMenu"
+      let [_, numberString, programIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      createSemester numberString programIdString
+      semesterMenu pageNumber
     | otherwise = do
       clearScreen
       semesterMenu pageNumber
 
   createSemester :: String -> String -> IO ()
-  createSemester semesterTitle semesterSpecialityId = do
+  createSemester semesterNumber semesterProgramId = do
     contents <- customReadFile _DB_SEMESTER_FILE_NAME
     let linesOfFile = lines contents
     let semesterList = createSemesterList linesOfFile []
-    let semesterId = show (getSemesterId (maximumBy (\a b -> compare (getSemesterId a) (getSemesterId b)) semesterList) + 1)
-    customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME (unlines (linesOfFile ++ ["Semester " ++ semesterId ++ " " ++ semesterTitle ++ " " ++ semesterSpecialityId]))
+    let semesterListByProgramId = filter (\s -> getSemesterProgramId s == (read semesterProgramId :: Integer)) semesterList
+    let semesterListByProgramIdByNumber = filter (\s -> getSemesterNumber s == (read semesterNumber :: Integer)) semesterListByProgramId
+    let firstError = if length semesterListByProgramId >= 8 then "Нельзя создать больше 8 семестров в учебном плане!!!" else ""
+    let secondError = if (read semesterNumber :: Integer) > 8 then "Номер семестра не может превосходить 8!!!" else ""
+    let thirdError = if not (null semesterListByProgramIdByNumber) then "Нельзя создать два семестра с одинаковым номером в одном учебном плане!!!" else ""
+    let errorMessages = filter (not . null) [firstError, secondError, thirdError]
+    if null errorMessages
+      then do
+        let semesterId = show (getSemesterId (maximumBy (\a b -> compare (getSemesterId a) (getSemesterId b)) semesterList) + 1)
+        customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME (unlines (linesOfFile ++ ["Semester " ++ semesterId ++ " " ++ semesterNumber ++ " " ++ semesterProgramId]))
+        putStrLn $ "Семестр " ++ semesterNumber ++ " был создан."
+      else do
+        mapM_ printError errorMessages

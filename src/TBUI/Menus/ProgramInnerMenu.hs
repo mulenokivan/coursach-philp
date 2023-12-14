@@ -69,7 +69,7 @@ module TBUI.Menus.ProgramInnerMenu (
       ) semesterListByProgramId
 
     printNoticeList [
-      "[1] Главное меню"
+      "Чтобы вернуться в главное меню, введите: 'Back'"
       ]
 
     input <- getLine
@@ -77,7 +77,7 @@ module TBUI.Menus.ProgramInnerMenu (
 
   stringOperations :: String -> [String] -> [Program] -> Integer -> IO (String, Integer)
   stringOperations inputValue linesOfFile programList id
-    | (findSubStrIdx inputValue "[1]" 0 /= Nothing) = do
+    | (findSubStrIdx inputValue "Back" 0 /= Nothing) = do
       return ("StartMenu", 1)
     | otherwise = do
       clearScreen

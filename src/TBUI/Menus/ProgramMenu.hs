@@ -35,8 +35,9 @@ module TBUI.Menus.ProgramMenu (
       ) programList
 
     printNoticeList [
-      "[1] Главное меню",
-      "Чтобы создать учебный план, напишите: 'Create <название> <id направления подготовки>' "
+      "Чтобы вернуться в главное меню, введите: 'Back'",
+      "Чтобы создать учебный план, введите: 'Create <название> <id направления подготовки>'",
+      "Чтобы раскрыть содержимое учебного плана введите: 'Goto <id>'"
       ]
 
     input <- getLine
@@ -44,7 +45,7 @@ module TBUI.Menus.ProgramMenu (
 
   stringOperations :: String -> [String] -> [Program] -> IO (String, Integer)
   stringOperations inputValue linesOfFile programList
-    | (findSubStrIdx inputValue "[1]" 0 /= Nothing) = do
+    | (findSubStrIdx inputValue "Back" 0 /= Nothing) = do
       return ("StartMenu", 1)
     | (findSubStrIdx inputValue "Goto" 0 /= Nothing) = do
       let [_, id] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
