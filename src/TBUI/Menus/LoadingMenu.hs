@@ -3,7 +3,7 @@ module TBUI.Menus.LoadingMenu (
 ) where
   -- LIBRARIES
   import Text.Read (readMaybe)
-  import Data.Maybe (fromJust)
+  import Data.Maybe (fromJust, isNothing)
   import Data.Char (isDigit)
   import Data.List (maximumBy, intercalate)
   import qualified System.Console.ANSI as ANSI
@@ -20,6 +20,7 @@ module TBUI.Menus.LoadingMenu (
 
   -- TBUI
   import TBUI.Tools
+  import Control.Monad (guard)
 
   _PAGINATE_PER :: Int
   _PAGINATE_PER = 6
@@ -66,7 +67,8 @@ module TBUI.Menus.LoadingMenu (
     semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
     let semesterLinesOfFile = lines semesterContents
     let semesterList = createSemesterList semesterLinesOfFile []
-    let semesterByLoadingId = head (filter (\s -> getSemesterId s == (read loadingSemesterId :: Integer)) semesterList)
+    let semestersByLoadingId = filter (\s -> getSemesterId s == (read loadingSemesterId :: Integer)) semesterList
+    let semesterByLoadingId = head semestersByLoadingId
 
     programContents <- customReadFile _DB_PROGRAM_FILE_NAME
     let programLinesOfFile = lines programContents
@@ -76,9 +78,30 @@ module TBUI.Menus.LoadingMenu (
     let loadingListByProgramId = (\semester -> filter (\l -> getSemesterId semester == getLoadingSemesterId l) loadingList) =<< semesterListByProgramId
     let loadingHoursSumByProgramId = sum (map getLoadingHours loadingListByProgramId)
 
-    let firstError = if (loadingHoursSumByProgramId + read loadingHours :: Integer) >= 240 then "Аяйяяй!" else ""
+    let semesterListByFirstYear = filter (\s -> getSemesterNumber s == 1) semesterListByProgramId ++ filter (\s -> getSemesterNumber s == 2) semesterListByProgramId
+    let semesterListBySecondYear = filter (\s -> getSemesterNumber s == 3) semesterListByProgramId ++ filter (\s -> getSemesterNumber s == 4) semesterListByProgramId
+    let semesterListByThirdYear = filter (\s -> getSemesterNumber s == 5) semesterListByProgramId ++ filter (\s -> getSemesterNumber s == 6) semesterListByProgramId
+    let semesterListByFourthYear = filter (\s -> getSemesterNumber s == 7) semesterListByProgramId ++ filter (\s -> getSemesterNumber s == 8) semesterListByProgramId
 
-    let errorMessages = filter (not . null) [firstError]
+    let loadingListByFirstYear = (\semester -> filter (\l -> getSemesterId semester == getLoadingSemesterId l) loadingList) =<< semesterListByFirstYear
+    let loadingListBySecondYear = (\semester -> filter (\l -> getSemesterId semester == getLoadingSemesterId l) loadingList) =<< semesterListBySecondYear
+    let loadingListByThirdYear = (\semester -> filter (\l -> getSemesterId semester == getLoadingSemesterId l) loadingList) =<< semesterListByThirdYear
+    let loadingListByFourthYear = (\semester -> filter (\l -> getSemesterId semester == getLoadingSemesterId l) loadingList) =<< semesterListByFourthYear
+
+    let loadingHoursSumByFirstYear = sum (map getLoadingHours loadingListByFirstYear)
+    let loadingHoursSumBySecondYear = sum (map getLoadingHours loadingListBySecondYear)
+    let loadingHoursSumByThirdYear = sum (map getLoadingHours loadingListByThirdYear)
+    let loadingHoursSumByFourthYear = sum (map getLoadingHours loadingListByFourthYear)
+
+    let semesterNumber = getSemesterNumber semesterByLoadingId
+
+    let firstError = if (loadingHoursSumByProgramId + read loadingHours :: Integer) > 8640 then "Нельзя, чтобы суммарная нагрузка в учебном плане превышала 8640 часов. Текущая нагрузка: " ++ show loadingHoursSumByProgramId else ""
+    let secondError = if (semesterNumber == 1 || semesterNumber == 2) && (loadingHoursSumByFirstYear + read loadingHours :: Integer) > 2520 then "Нельзя, чтобы суммарная нагрузка в учебном плане за год превышала 2520 часов. Текущая нагрузка в выбранном учебном году: " ++ show loadingHoursSumByFirstYear else ""
+    let thirdError = if (semesterNumber == 3 || semesterNumber == 4) && (loadingHoursSumBySecondYear + read loadingHours :: Integer) > 2520 then "Нельзя, чтобы суммарная нагрузка в учебном плане за год превышала 2520 часов. Текущая нагрузка в выбранном учебном году: " ++ show loadingHoursSumBySecondYear else ""
+    let fourthError = if (semesterNumber == 5 || semesterNumber == 6) && (loadingHoursSumByThirdYear + read loadingHours :: Integer) > 2520 then "Нельзя, чтобы суммарная нагрузка в учебном плане за год превышала 2520 часов. Текущая нагрузка в выбранном учебном году: " ++ show loadingHoursSumByThirdYear else ""
+    let fifthError = if (semesterNumber == 7 || semesterNumber == 8) && (loadingHoursSumByFourthYear + read loadingHours :: Integer) > 2520 then "Нельзя, чтобы суммарная нагрузка в учебном плане за год превышала 2520 часов. Текущая нагрузка в выбранном учебном году: " ++ show loadingHoursSumByFourthYear else ""
+
+    let errorMessages = filter (not . null) [firstError, secondError, thirdError, fourthError, fifthError]
     if null errorMessages
       then do
         let loadingId = show (getLoadingId (maximumBy (\a b -> compare (getLoadingId a) (getLoadingId b)) loadingList) + 1)
