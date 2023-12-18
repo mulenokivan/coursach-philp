@@ -53,7 +53,14 @@ module TBUI.Menus.ProgramMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, specialityIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createProgram titleString specialityIdString
-      return ("StartMenu", 1)
+      programMenu
+    | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
+      let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let program = findProgramById programList (read idString :: Integer)
+      let programTitle = getProgramTitle program
+      deleteProgram linesOfFile program
+      printSuccess ("Учебный план " ++ "\"" ++ programTitle ++ "\"" ++ " удален")
+      programMenu
     | otherwise = do
       clearScreen
       programMenu

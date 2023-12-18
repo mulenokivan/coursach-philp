@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use isNothing" #-}
 module Models.Program (
   Program,
   _DB_PROGRAM_FILE_NAME,
@@ -44,7 +46,8 @@ module Models.Program (
   -- OPERATIONS WITH RECORDS
   deleteProgram :: [String] -> Program -> IO ()
   deleteProgram linesOfFile program = do
-    let filteredLinesOfFile = filter (/= show program) linesOfFile
+    let programId = show (getProgramId program)
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Program " ++ programId) 0 == Nothing) linesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_PROGRAM_FILE_NAME _DB_PROGRAM_TEMP_FILE_NAME test
 
@@ -81,3 +84,10 @@ module Models.Program (
       return ()
     else
       writeFile _DB_PROGRAM_FILE_NAME ""
+
+  -- Other
+  findSubStrIdx :: String -> String -> Integer -> Maybe Integer
+  findSubStrIdx "" _ _ = Nothing
+  findSubStrIdx s target n
+    | take (length target) s == target = Just n
+    | otherwise = findSubStrIdx (tail s) target (n + 1)
