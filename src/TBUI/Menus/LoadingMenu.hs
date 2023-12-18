@@ -39,7 +39,8 @@ module TBUI.Menus.LoadingMenu (
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
-      "Чтобы создать учебный план, напишите: 'Create <кол-во часов> <id дисциплины> <id семестра> <тип нагрузки>' "
+      "Чтобы создать учебный план, напишите: 'Create <кол-во часов> <id дисциплины> <id семестра> <тип нагрузки>' ",
+      "Чтобы удалить нагрузку, напишите: 'Delete <id>' "
       ]
 
     input <- getLine
@@ -52,6 +53,12 @@ module TBUI.Menus.LoadingMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, hoursString, disciplineIdString, semesterIdString, kindString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createLoading hoursString disciplineIdString semesterIdString kindString
+      loadingMenu
+    | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
+      let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let loading = findLoadingById loadingList (read idString :: Integer)
+      deleteLoading linesOfFile loading
+      printSuccess "Нагрузка удалена"
       loadingMenu
     | otherwise = do
       clearScreen

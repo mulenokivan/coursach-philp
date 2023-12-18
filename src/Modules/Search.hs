@@ -11,6 +11,7 @@ module Modules.Search (
   findLoadingsBySemesterId,
   findLoadingsBySemesterIdAndDisciplineId,
   findSemesterById,
+  findLoadingById,
   findSubStrIdx
 ) where
   -- LIBRARIES
@@ -63,6 +64,10 @@ module Modules.Search (
     | otherwise = findDisciplinesByProgramId xs programId
 
   --Loading
+  findLoadingById :: [Loading] -> Integer -> Loading
+  findLoadingById (x:xs) loadingId
+    | (getLoadingId x == loadingId) = x
+    | otherwise = findLoadingById xs loadingId
   findLoadingsByDisciplineId :: [Loading] -> Integer -> [Loading]
   findLoadingsByDisciplineId [] _ = []
   findLoadingsByDisciplineId (x:xs) disciplineId

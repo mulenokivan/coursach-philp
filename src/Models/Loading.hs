@@ -50,7 +50,8 @@ module Models.Loading (
   -- OPERATIONS WITH RECORDS
   deleteLoading :: [String] -> Loading -> IO ()
   deleteLoading linesOfFile loading = do
-    let filteredLinesOfFile = filter (/= show loading) linesOfFile
+    let loadingId = show (getLoadingId loading)
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Loading " ++ loadingId) 0 == Nothing) linesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME test
 
@@ -101,3 +102,10 @@ module Models.Loading (
       return ()
     else
       writeFile _DB_LOADING_FILE_NAME ""
+
+  -- Other
+  findSubStrIdx :: String -> String -> Integer -> Maybe Integer
+  findSubStrIdx "" _ _ = Nothing
+  findSubStrIdx s target n
+    | take (length target) s == target = Just n
+    | otherwise = findSubStrIdx (tail s) target (n + 1)
