@@ -10,6 +10,7 @@ module Models.Loading (
   getLoadingDisciplineId,
   getLoadingSemesterId,
   getLoadingKind,
+  getLoadingKindAndHours,
   getLoadingSemesterIdAndDisciplineId,
   ifLoadingFileExist,
   printLoading
@@ -88,6 +89,9 @@ module Models.Loading (
 
   getLoadingKind :: Loading -> String
   getLoadingKind (Loading _ _ _ _ kind) = kind
+
+  getLoadingKindAndHours :: Loading -> [String]
+  getLoadingKindAndHours (Loading _ hours _ _ kind) = [show hours, kind]
 
   -- CONDITIONS
   ifLoadingFileExist :: IO ()

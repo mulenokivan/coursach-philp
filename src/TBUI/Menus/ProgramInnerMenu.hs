@@ -48,6 +48,7 @@ module TBUI.Menus.ProgramInnerMenu (
 
     mapM_ (\semester -> do
         let semesterNumber = getSemesterNumber semester
+        putStrLn ("-------------------------------------------------------------------------------")
         putStrLn (show semesterNumber ++ " Семестр")
         let semesterId = getSemesterId semester
         let loadings = findLoadingsBySemesterId wholeLoadingList semesterId
@@ -55,17 +56,19 @@ module TBUI.Menus.ProgramInnerMenu (
         mapM_ (\disciplineId -> do
             let discipline = findDisciplineById disciplineListByProgramId disciplineId
             let disciplineTitle = getDisciplineTitle discipline
-            let disciplineLoadingHours = sum (map getLoadingHours (findLoadingsByDisciplineId loadings disciplineId))
-            putStrLn ("         " ++ disciplineTitle ++ " " ++ show disciplineLoadingHours ++ " ч.")
+            let loadingsByDiscipline = findLoadingsByDisciplineId loadings disciplineId
+            let disciplineLoadingHours = sum (map getLoadingHours loadingsByDiscipline)
+            putStrLn ("         " ++ disciplineTitle ++ " " ++ show disciplineLoadingHours ++ " ч. " ++ "из них:")
+            mapM_ (\loading -> do
+              let loadingHours = getLoadingHours loading
+              let loadingKind = getLoadingKind loading
+              putStrLn ("                                           " ++ show loadingHours ++ " ч. " ++ loadingKind)
+              ) loadingsByDiscipline
+            putStrLn ("")
           ) disciplineIds
-        -- mapM_ (\loading -> do
-        --     let loadingId = getLoadingDisciplineId loading
-        --     let discipline = findDisciplineById disciplineListByProgramId loadingId
-        --     let disciplineTitle = getDisciplineTitle discipline
-        --     let loadingHours = getLoadingHours loading
-        --     let loadingKind = getLoadingKind loading
-        --     putStrLn ("         " ++ disciplineTitle ++ " " ++ show loadingHours ++ " " ++ loadingKind)
-        --   ) loadings
+        let semesterLoadingHours = sum (map getLoadingHours loadings)
+        putStrLn ("Суммарная нагрузка за семестр:" ++ " " ++ show semesterLoadingHours ++ " ч. ")
+        putStrLn ("-------------------------------------------------------------------------------")
       ) semesterListByProgramId
 
     printNoticeList [
