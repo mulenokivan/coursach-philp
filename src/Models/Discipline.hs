@@ -44,7 +44,8 @@ module Models.Discipline (
   -- OPERATIONS WITH RECORDS
   deleteDiscipline :: [String] -> Discipline -> IO ()
   deleteDiscipline linesOfFile discipline = do
-    let filteredLinesOfFile = filter (/= show discipline) linesOfFile
+    let disciplineId = show (getDisciplineId discipline)
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Discipline " ++ disciplineId) 0 == Nothing) linesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_DISCIPLINE_FILE_NAME _DB_DISCIPLINE_TEMP_FILE_NAME test
 
@@ -81,3 +82,10 @@ module Models.Discipline (
       return ()
     else
       writeFile _DB_DISCIPLINE_FILE_NAME ""
+
+  -- Other
+  findSubStrIdx :: String -> String -> Integer -> Maybe Integer
+  findSubStrIdx "" _ _ = Nothing
+  findSubStrIdx s target n
+    | take (length target) s == target = Just n
+    | otherwise = findSubStrIdx (tail s) target (n + 1)

@@ -40,7 +40,7 @@ module TBUI.Menus.SemesterMenu (
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' ",
-      "Чтобы удалить учебный план, напишите: 'Delete <id>' "
+      "Чтобы удалить семестр, напишите: 'Delete <id>' "
       ]
 
     input <- getLine

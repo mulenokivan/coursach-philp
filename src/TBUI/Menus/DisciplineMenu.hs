@@ -37,7 +37,8 @@ module TBUI.Menus.DisciplineMenu (
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
-      "Чтобы создать учебный план, напишите: 'Create <название> <id учебного плана>' "
+      "Чтобы создать учебный план, напишите: 'Create <название> <id учебного плана>' ",
+      "Чтобы удалить дисциплину, напишите: 'Delete <id>' "
       ]
 
     input <- getLine
@@ -50,6 +51,13 @@ module TBUI.Menus.DisciplineMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, programIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createDiscipline titleString programIdString
+      disciplineMenu
+    | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
+      let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let discipline = findDisciplineById disciplineList (read idString :: Integer)
+      let disciplineTitle = getDisciplineTitle discipline
+      deleteDiscipline linesOfFile discipline
+      printSuccess ("Дисциплина " ++ "\"" ++ disciplineTitle ++ "\"" ++ " удалена")
       disciplineMenu
     | otherwise = do
       clearScreen
