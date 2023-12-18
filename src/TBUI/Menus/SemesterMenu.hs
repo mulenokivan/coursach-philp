@@ -39,7 +39,8 @@ module TBUI.Menus.SemesterMenu (
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
-      "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' "
+      "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' ",
+      "Чтобы удалить учебный план, напишите: 'Delete <id>' "
       ]
 
     input <- getLine
@@ -52,6 +53,13 @@ module TBUI.Menus.SemesterMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, numberString, programIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createSemester numberString programIdString
+      semesterMenu pageNumber
+    | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
+      let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let semester = findSemesterById semesterList (read idString :: Integer)
+      let semesterNumber = getSemesterNumber semester
+      deleteSemester linesOfFile semester
+      printSuccess ("Семестр №" ++ "\"" ++ show semesterNumber ++ "\"" ++ " удален")
       semesterMenu pageNumber
     | otherwise = do
       clearScreen

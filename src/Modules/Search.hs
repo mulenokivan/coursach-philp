@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant bracket" #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Modules.Search (
   findSpecialityById,
   findProgramById,
@@ -7,6 +10,7 @@ module Modules.Search (
   findLoadingsByDisciplineId,
   findLoadingsBySemesterId,
   findLoadingsBySemesterIdAndDisciplineId,
+  findSemesterById,
   findSubStrIdx
 ) where
   -- LIBRARIES
@@ -40,6 +44,11 @@ module Modules.Search (
   findSemestersByProgramId (x:xs) programId
     | (getSemesterProgramId x == programId) = x : findSemestersByProgramId xs programId
     | otherwise = findSemestersByProgramId xs programId
+
+  findSemesterById :: [Semester] -> Integer -> Semester
+  findSemesterById (x:xs) semesterId
+    | (getSemesterId x == semesterId) = x
+    | otherwise = findSemesterById xs semesterId
 
   --Discipline
   findDisciplineById :: [Discipline] -> Integer -> Discipline

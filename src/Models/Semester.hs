@@ -44,7 +44,8 @@ module Models.Semester (
   -- OPERATIONS WITH RECORDS
   deleteSemester :: [String] -> Semester -> IO ()
   deleteSemester linesOfFile semester = do
-    let filteredLinesOfFile = filter (/= show semester) linesOfFile
+    let semesterId = show (getSemesterId semester)
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Semester " ++ semesterId) 0 == Nothing) linesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME test
 
@@ -82,3 +83,10 @@ module Models.Semester (
       return ()
     else
       writeFile _DB_SEMESTER_FILE_NAME ""
+
+  -- Other
+  findSubStrIdx :: String -> String -> Integer -> Maybe Integer
+  findSubStrIdx "" _ _ = Nothing
+  findSubStrIdx s target n
+    | take (length target) s == target = Just n
+    | otherwise = findSubStrIdx (tail s) target (n + 1)
