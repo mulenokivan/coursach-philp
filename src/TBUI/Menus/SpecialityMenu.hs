@@ -5,7 +5,7 @@ module TBUI.Menus.SpecialityMenu (
   import Text.Read (readMaybe)
   import Data.Maybe (fromJust)
   import Data.Char (isDigit)
-  import Data.List (maximumBy, intercalate)
+  import Data.List (maximumBy, intercalate, delete,intersperse)
   import qualified System.Console.ANSI as ANSI
 
   -- MODELS
@@ -17,7 +17,8 @@ module TBUI.Menus.SpecialityMenu (
   import Modules.ReadDB
 
   -- TBUI
-  import TBUI.Tools (clearScreen, printError, printHeader, printNoticeList)
+  -- TBUI
+  import TBUI.Tools
 
   _PAGINATE_PER :: Int
   _PAGINATE_PER = 6
@@ -36,7 +37,8 @@ module TBUI.Menus.SpecialityMenu (
 
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
-      "Чтобы создать направление подготовки, напишите: 'Create <название> <код>' "
+      "Чтобы создать направление подготовки, напишите: 'Create <название> <код>' ",
+      "Чтобы удалить направление подготовки, напишите: 'Delete <id>' "
       ]
 
     input <- getLine
@@ -49,7 +51,14 @@ module TBUI.Menus.SpecialityMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, codeString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createSpeciality titleString codeString
-      return "StartMenu"
+      specialityMenu
+    | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
+      let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let speciality = findSpecialityById specialityList (read idString :: Integer)
+      let specialityTitle = getSpecialityTitle speciality
+      deleteSpeciality linesOfFile speciality
+      printSuccess ("Направление подготовки " ++ "\"" ++ specialityTitle ++ "\"" ++ " удалено")
+      specialityMenu
     | otherwise = do
       clearScreen
       specialityMenu

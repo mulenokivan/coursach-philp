@@ -44,7 +44,8 @@ module Models.Speciality (
   -- OPERATIONS WITH RECORDS
   deleteSpeciality :: [String] -> Speciality -> IO ()
   deleteSpeciality linesOfFile speciality = do
-    let filteredLinesOfFile = filter (/= show speciality) linesOfFile
+    let specialityId = show (getSpecialityId speciality)
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Speciality " ++ specialityId) 0 == Nothing) linesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_SPECIALITY_FILE_NAME _DB_SPECIALITY_TEMP_FILE_NAME test
 
@@ -80,3 +81,10 @@ module Models.Speciality (
       return ()
     else
       writeFile _DB_SPECIALITY_FILE_NAME ""
+
+  -- Other
+  findSubStrIdx :: String -> String -> Integer -> Maybe Integer
+  findSubStrIdx "" _ _ = Nothing
+  findSubStrIdx s target n
+    | take (length target) s == target = Just n
+    | otherwise = findSubStrIdx (tail s) target (n + 1)
