@@ -59,7 +59,7 @@ module TBUI.Menus.ProgramMenu (
       let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       let program = findProgramById programList (read idString :: Integer)
       let programTitle = getProgramTitle program
-      deleteProgram linesOfFile program
+      deleteProgram program
       printSuccess ("Учебный план " ++ "\"" ++ programTitle ++ "\"" ++ " удален")
       programMenu
     | otherwise = do

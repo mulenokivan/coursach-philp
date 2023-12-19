@@ -17,7 +17,8 @@ module Models.Semester (
 
   -- MODULES
   import Modules.ReadDB
-  import Modules.File (customWriteFile)
+  import Modules.File
+  import Models.Loading
 
   -- TYPES
   data Semester = Semester {
@@ -42,11 +43,19 @@ module Models.Semester (
   createLocalSemester id number programId = Semester id number programId
 
   -- OPERATIONS WITH RECORDS
-  deleteSemester :: [String] -> Semester -> IO ()
-  deleteSemester linesOfFile semester = do
+  deleteSemester :: Semester -> IO ()
+  deleteSemester semester = do
+    semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
+    let semesterlinesOfFile = lines semesterContents
     let semesterId = show (getSemesterId semester)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Semester " ++ semesterId) 0 == Nothing) linesOfFile
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Semester " ++ semesterId) 0 == Nothing) semesterlinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
+    loadingContents <- customReadFile _DB_LOADING_FILE_NAME
+    let loadinglinesOfFile = lines loadingContents
+    let loadingList = findLoadingsBySemesterId (createLoadingList loadinglinesOfFile []) (read semesterId :: Integer)
+    mapM_(\loading -> do
+        deleteLoading loading
+      ) loadingList
     customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME test
 
   createSemesterList :: [String] -> [Semester] -> [Semester]
@@ -90,3 +99,9 @@ module Models.Semester (
   findSubStrIdx s target n
     | take (length target) s == target = Just n
     | otherwise = findSubStrIdx (tail s) target (n + 1)
+
+  findLoadingsBySemesterId :: [Loading] -> Integer -> [Loading]
+  findLoadingsBySemesterId [] _ = []
+  findLoadingsBySemesterId (x:xs) semesterId
+    | (getLoadingSemesterId x == semesterId) = x : findLoadingsBySemesterId xs semesterId
+    | otherwise = findLoadingsBySemesterId xs semesterId

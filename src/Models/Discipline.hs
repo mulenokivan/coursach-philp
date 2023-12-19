@@ -17,7 +17,8 @@ module Models.Discipline (
 
   -- MODULES
   import Modules.ReadDB
-  import Modules.File (customWriteFile)
+  import Modules.File
+  import Models.Loading
 
   -- TYPES
   data Discipline = Discipline {
@@ -42,11 +43,19 @@ module Models.Discipline (
   createLocalDiscipline id title programId = Discipline id title programId
 
   -- OPERATIONS WITH RECORDS
-  deleteDiscipline :: [String] -> Discipline -> IO ()
-  deleteDiscipline linesOfFile discipline = do
+  deleteDiscipline :: Discipline -> IO ()
+  deleteDiscipline discipline = do
+    disciplineContents <- customReadFile _DB_DISCIPLINE_FILE_NAME
+    let disciplinelinesOfFile = lines disciplineContents
     let disciplineId = show (getDisciplineId discipline)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Discipline " ++ disciplineId) 0 == Nothing) linesOfFile
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Discipline " ++ disciplineId) 0 == Nothing) disciplinelinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
+    loadingContents <- customReadFile _DB_LOADING_FILE_NAME
+    let loadinglinesOfFile = lines loadingContents
+    let loadingList = findLoadingsByDisciplineId (createLoadingList loadinglinesOfFile []) (read disciplineId :: Integer)
+    mapM_(\loading -> do
+        deleteLoading loading
+      ) loadingList
     customWriteFile _DB_DISCIPLINE_FILE_NAME _DB_DISCIPLINE_TEMP_FILE_NAME test
 
   createDisciplineList :: [String] -> [Discipline] -> [Discipline]
@@ -89,3 +98,9 @@ module Models.Discipline (
   findSubStrIdx s target n
     | take (length target) s == target = Just n
     | otherwise = findSubStrIdx (tail s) target (n + 1)
+
+  findLoadingsByDisciplineId :: [Loading] -> Integer -> [Loading]
+  findLoadingsByDisciplineId [] _ = []
+  findLoadingsByDisciplineId (x:xs) disciplineId
+    | (getLoadingDisciplineId x == disciplineId) = x : findLoadingsByDisciplineId xs disciplineId
+    | otherwise = findLoadingsByDisciplineId xs disciplineId

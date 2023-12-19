@@ -21,7 +21,7 @@ module Models.Loading (
 
   -- MODULES
   import Modules.ReadDB
-  import Modules.File (customWriteFile)
+  import Modules.File
 
   -- TYPES
   data Loading = Loading {
@@ -48,10 +48,12 @@ module Models.Loading (
   createLocalLoading id hours discipline_id semester_id kind = Loading id hours discipline_id semester_id kind
 
   -- OPERATIONS WITH RECORDS
-  deleteLoading :: [String] -> Loading -> IO ()
-  deleteLoading linesOfFile loading = do
+  deleteLoading :: Loading -> IO ()
+  deleteLoading loading = do
+    loadingContents <- customReadFile _DB_LOADING_FILE_NAME
+    let loadinglinesOfFile = lines loadingContents
     let loadingId = show (getLoadingId loading)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Loading " ++ loadingId) 0 == Nothing) linesOfFile
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Loading " ++ loadingId) 0 == Nothing) loadinglinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME test
 

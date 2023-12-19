@@ -56,7 +56,7 @@ module TBUI.Menus.DisciplineMenu (
       let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       let discipline = findDisciplineById disciplineList (read idString :: Integer)
       let disciplineTitle = getDisciplineTitle discipline
-      deleteDiscipline linesOfFile discipline
+      deleteDiscipline discipline
       printSuccess ("Дисциплина " ++ "\"" ++ disciplineTitle ++ "\"" ++ " удалена")
       disciplineMenu
     | otherwise = do

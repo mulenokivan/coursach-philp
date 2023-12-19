@@ -4,6 +4,7 @@
 module Modules.Search (
   findSpecialityById,
   findProgramById,
+  findProgramsBySpecialityId,
   findSemestersByProgramId,
   findDisciplinesByProgramId,
   findDisciplineById,
@@ -38,6 +39,12 @@ module Modules.Search (
   findProgramById (x:xs) programId
     | (getProgramId x == programId) = x
     | otherwise = findProgramById xs programId
+
+  findProgramsBySpecialityId :: [Program] -> Integer -> [Program]
+  findProgramsBySpecialityId [] _ = []
+  findProgramsBySpecialityId (x:xs) specialityId
+    | (getProgramSpecialityId x == specialityId) = x : findProgramsBySpecialityId xs specialityId
+    | otherwise = findProgramsBySpecialityId xs specialityId
 
   -- Semester
   findSemestersByProgramId :: [Semester] -> Integer -> [Semester]

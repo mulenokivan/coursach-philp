@@ -57,7 +57,7 @@ module TBUI.Menus.LoadingMenu (
     | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
       let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       let loading = findLoadingById loadingList (read idString :: Integer)
-      deleteLoading linesOfFile loading
+      deleteLoading loading
       printSuccess "Нагрузка удалена"
       loadingMenu
     | otherwise = do

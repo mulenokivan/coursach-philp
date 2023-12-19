@@ -1,0 +1,6 @@
+    loadingContents <- customReadFile _DB_LOADING_FILE_NAME
+    let loadinglinesOfFile = lines loadingContents
+    let loadingList = findLoadingsBySemesterId (createLoadingList loadinglinesOfFile []) (read semesterId :: Integer)
+    mapM_(\loading -> do
+        deleteLoading loading
+      ) loadingList

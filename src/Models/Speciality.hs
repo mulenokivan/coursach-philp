@@ -12,12 +12,14 @@ module Models.Speciality (
   printSpeciality
 ) where
   -- LIBRARIES
-  import System.Directory (doesFileExist)
-  import Data.List (intersperse)
+  import System.Directory
+  import Data.List
 
   -- MODULES
   import Modules.ReadDB
-  import Modules.File (customWriteFile)
+  import Modules.File
+  import Models.Program
+  import GHC.IO (unsafePerformIO)
 
   -- TYPES
   data Speciality = Speciality {
@@ -42,11 +44,19 @@ module Models.Speciality (
   createLocalSpeciality id title code = Speciality id title code
 
   -- OPERATIONS WITH RECORDS
-  deleteSpeciality :: [String] -> Speciality -> IO ()
-  deleteSpeciality linesOfFile speciality = do
+  deleteSpeciality :: Speciality -> IO ()
+  deleteSpeciality speciality = do
+    specialityContents <- customReadFile _DB_SPECIALITY_FILE_NAME
+    let specialitylinesOfFile = lines specialityContents
     let specialityId = show (getSpecialityId speciality)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Speciality " ++ specialityId) 0 == Nothing) linesOfFile
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Speciality " ++ specialityId) 0 == Nothing) specialitylinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
+    programContents <- customReadFile _DB_PROGRAM_FILE_NAME
+    let programlinesOfFile = lines programContents
+    let programList = findProgramsBySpecialityId (createProgramList programlinesOfFile []) (read specialityId :: Integer)
+    mapM_(\program -> do
+        deleteProgram program
+      ) programList
     customWriteFile _DB_SPECIALITY_FILE_NAME _DB_SPECIALITY_TEMP_FILE_NAME test
 
   createSpecialityList :: [String] -> [Speciality] -> [Speciality]
@@ -72,6 +82,12 @@ module Models.Speciality (
 
   getSpecialityCode :: Speciality -> String
   getSpecialityCode (Speciality _ _ code) = code
+
+  findProgramsBySpecialityId :: [Program] -> Integer -> [Program]
+  findProgramsBySpecialityId [] _ = []
+  findProgramsBySpecialityId (x:xs) specialityId
+    | (getProgramSpecialityId x == specialityId) = x : findProgramsBySpecialityId xs specialityId
+    | otherwise = findProgramsBySpecialityId xs specialityId
 
   -- CONDITIONS
   ifSpecialityFileExist :: IO ()

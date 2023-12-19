@@ -19,7 +19,9 @@ module Models.Program (
 
   -- MODULES
   import Modules.ReadDB
-  import Modules.File (customWriteFile)
+  import Modules.File
+  import Models.Semester
+  import Models.Discipline
 
   -- TYPES
   data Program = Program {
@@ -44,11 +46,25 @@ module Models.Program (
   createLocalProgram id title specialityId = Program id title specialityId
 
   -- OPERATIONS WITH RECORDS
-  deleteProgram :: [String] -> Program -> IO ()
-  deleteProgram linesOfFile program = do
+  deleteProgram :: Program -> IO ()
+  deleteProgram program = do
+    programContents <- customReadFile _DB_PROGRAM_FILE_NAME
+    let programlinesOfFile = lines programContents
     let programId = show (getProgramId program)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Program " ++ programId) 0 == Nothing) linesOfFile
+    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Program " ++ programId) 0 == Nothing) programlinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
+    semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
+    let semesterlinesOfFile = lines semesterContents
+    let semesterList = findSemestersByProgramId (createSemesterList semesterlinesOfFile []) (read programId :: Integer)
+    mapM_(\semester -> do
+        deleteSemester semester
+      ) semesterList
+    disciplineContents <- customReadFile _DB_DISCIPLINE_FILE_NAME
+    let disciplinelinesOfFile = lines disciplineContents
+    let disciplineList = findDisciplinesByProgramId (createDisciplineList disciplinelinesOfFile []) (read programId :: Integer)
+    mapM_(\discipline -> do
+        deleteDiscipline discipline
+      ) disciplineList
     customWriteFile _DB_PROGRAM_FILE_NAME _DB_PROGRAM_TEMP_FILE_NAME test
 
   createProgramList :: [String] -> [Program] -> [Program]
@@ -91,3 +107,15 @@ module Models.Program (
   findSubStrIdx s target n
     | take (length target) s == target = Just n
     | otherwise = findSubStrIdx (tail s) target (n + 1)
+
+  findSemestersByProgramId :: [Semester] -> Integer -> [Semester]
+  findSemestersByProgramId [] _ = []
+  findSemestersByProgramId (x:xs) programId
+    | (getSemesterProgramId x == programId) = x : findSemestersByProgramId xs programId
+    | otherwise = findSemestersByProgramId xs programId
+
+  findDisciplinesByProgramId :: [Discipline] -> Integer -> [Discipline]
+  findDisciplinesByProgramId [] _ = []
+  findDisciplinesByProgramId (x:xs) programId
+    | (getDisciplineProgramId x == programId) = x : findDisciplinesByProgramId xs programId
+    | otherwise = findDisciplinesByProgramId xs programId

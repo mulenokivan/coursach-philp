@@ -58,7 +58,7 @@ module TBUI.Menus.SemesterMenu (
       let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       let semester = findSemesterById semesterList (read idString :: Integer)
       let semesterNumber = getSemesterNumber semester
-      deleteSemester linesOfFile semester
+      deleteSemester semester
       printSuccess ("Семестр №" ++ "\"" ++ show semesterNumber ++ "\"" ++ " удален")
       semesterMenu pageNumber
     | otherwise = do

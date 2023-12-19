@@ -56,7 +56,7 @@ module TBUI.Menus.SpecialityMenu (
       let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       let speciality = findSpecialityById specialityList (read idString :: Integer)
       let specialityTitle = getSpecialityTitle speciality
-      deleteSpeciality linesOfFile speciality
+      deleteSpeciality speciality
       printSuccess ("Направление подготовки " ++ "\"" ++ specialityTitle ++ "\"" ++ " удалено")
       specialityMenu
     | otherwise = do
