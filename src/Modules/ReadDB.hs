@@ -3,6 +3,7 @@ module Modules.ReadDB (
   removeQuotesFromArray,
   reverseArray,
   wordsWhen,
+  findLineById
 ) where
   -- OUTER METHODS
   splitOnQuotes :: String -> String -> [String] -> [String]
@@ -11,6 +12,14 @@ module Modules.ReadDB (
     | x == '"' = splitOnQuotesInQuotes xs (x:current) acc
     | x == ' ' = splitOnQuotes xs [] (current : acc)
     | otherwise = splitOnQuotes xs (x:current) acc
+
+  findLineById :: String -> Integer -> Bool
+  findLineById line specialityId = do
+    let array = splitOnQuotes line [] []
+    let idString = array !! 1
+    let test = reverse idString
+    let idInt = read test :: Integer
+    specialityId /= idInt
 
   removeQuotesFromArray :: [String] -> [String]
   removeQuotesFromArray = map removeQuotes

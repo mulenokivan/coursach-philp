@@ -48,7 +48,7 @@ module Models.Discipline (
     disciplineContents <- customReadFile _DB_DISCIPLINE_FILE_NAME
     let disciplinelinesOfFile = lines disciplineContents
     let disciplineId = show (getDisciplineId discipline)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Discipline " ++ disciplineId) 0 == Nothing) disciplinelinesOfFile
+    let filteredLinesOfFile = filter (\line -> findLineById line (read disciplineId :: Integer)) disciplinelinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     loadingContents <- customReadFile _DB_LOADING_FILE_NAME
     let loadinglinesOfFile = lines loadingContents

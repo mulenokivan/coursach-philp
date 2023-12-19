@@ -53,7 +53,7 @@ module Models.Loading (
     loadingContents <- customReadFile _DB_LOADING_FILE_NAME
     let loadinglinesOfFile = lines loadingContents
     let loadingId = show (getLoadingId loading)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Loading " ++ loadingId) 0 == Nothing) loadinglinesOfFile
+    let filteredLinesOfFile = filter (\line -> findLineById line (read loadingId :: Integer)) loadinglinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME test
 

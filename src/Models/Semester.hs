@@ -48,7 +48,7 @@ module Models.Semester (
     semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
     let semesterlinesOfFile = lines semesterContents
     let semesterId = show (getSemesterId semester)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Semester " ++ semesterId) 0 == Nothing) semesterlinesOfFile
+    let filteredLinesOfFile = filter (\line -> findLineById line (read semesterId :: Integer)) semesterlinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     loadingContents <- customReadFile _DB_LOADING_FILE_NAME
     let loadinglinesOfFile = lines loadingContents

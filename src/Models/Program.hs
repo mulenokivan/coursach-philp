@@ -51,7 +51,7 @@ module Models.Program (
     programContents <- customReadFile _DB_PROGRAM_FILE_NAME
     let programlinesOfFile = lines programContents
     let programId = show (getProgramId program)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Program " ++ programId) 0 == Nothing) programlinesOfFile
+    let filteredLinesOfFile = filter (\line -> findLineById line (read programId :: Integer)) programlinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
     let semesterlinesOfFile = lines semesterContents

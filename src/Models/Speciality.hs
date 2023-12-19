@@ -49,7 +49,7 @@ module Models.Speciality (
     specialityContents <- customReadFile _DB_SPECIALITY_FILE_NAME
     let specialitylinesOfFile = lines specialityContents
     let specialityId = show (getSpecialityId speciality)
-    let filteredLinesOfFile = filter (\line -> findSubStrIdx line ("Speciality " ++ specialityId) 0 == Nothing) specialitylinesOfFile
+    let filteredLinesOfFile = filter (\line -> findLineById line (read specialityId :: Integer)) specialitylinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     programContents <- customReadFile _DB_PROGRAM_FILE_NAME
     let programlinesOfFile = lines programContents
