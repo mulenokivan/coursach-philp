@@ -40,6 +40,7 @@ module TBUI.Menus.SemesterMenu (
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать семестр, напишите: 'Create <номер> <id учебного плана>' ",
+      "Чтобы обновить существующий семестр, напишите: 'Update <id> <номер> <id учебного плана>' ",
       "Чтобы удалить семестр, напишите: 'Delete <id>' "
       ]
 
@@ -60,6 +61,14 @@ module TBUI.Menus.SemesterMenu (
       let semesterNumber = getSemesterNumber semester
       deleteSemester semester
       printSuccess ("Семестр №" ++ "\"" ++ show semesterNumber ++ "\"" ++ " удален")
+      semesterMenu pageNumber
+    | (findSubStrIdx inputValue "Update" 0 /= Nothing) = do
+      let [_, idString, numberString, programIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let semester = findSemesterById semesterList (read idString :: Integer)
+      let semesterNumber = getSemesterNumber semester
+      let updatedSemester = createLocalSemester (read idString :: Integer) (read numberString :: Integer) (read programIdString :: Integer)
+      updateSemester updatedSemester
+      printSuccess ("Семестр №" ++ "\"" ++ show semesterNumber ++ "\"" ++ " обновлен")
       semesterMenu pageNumber
     | otherwise = do
       clearScreen

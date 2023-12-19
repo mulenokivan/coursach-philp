@@ -38,6 +38,7 @@ module TBUI.Menus.ProgramMenu (
       "Чтобы вернуться в главное меню, введите: 'Back'",
       "Чтобы создать учебный план, введите: 'Create <название> <id направления подготовки>'",
       "Чтобы удалить учебный план, напишите: 'Delete <id>' ",
+      "Чтобы обновить существующий учебный план, напишите: 'Update <id> <название> <id направления подготовки>' ",
       "Чтобы раскрыть содержимое учебного плана введите: 'Goto <id>'"
       ]
 
@@ -61,6 +62,14 @@ module TBUI.Menus.ProgramMenu (
       let programTitle = getProgramTitle program
       deleteProgram program
       printSuccess ("Учебный план " ++ "\"" ++ programTitle ++ "\"" ++ " удален")
+      programMenu
+    | (findSubStrIdx inputValue "Update" 0 /= Nothing) = do
+      let [_, idString, titleString, specialityIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let program = findProgramById programList (read idString :: Integer)
+      let programTitle = getProgramTitle program
+      let updatedProgram = createLocalProgram (read idString :: Integer) titleString (read specialityIdString :: Integer)
+      updateProgram updatedProgram
+      printSuccess ("Учебный план " ++ "\"" ++ programTitle ++ "\"" ++ " обновлен")
       programMenu
     | otherwise = do
       clearScreen

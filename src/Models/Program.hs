@@ -11,6 +11,7 @@ module Models.Program (
   getProgramTitle,
   getProgramSpecialityId,
   ifProgramFileExist,
+  updateProgram,
   printProgram
 ) where
   -- LIBRARIES
@@ -66,6 +67,17 @@ module Models.Program (
         deleteDiscipline discipline
       ) disciplineList
     customWriteFile _DB_PROGRAM_FILE_NAME _DB_PROGRAM_TEMP_FILE_NAME test
+
+  updateProgram :: Program -> IO ()
+  updateProgram program = do
+    programContents <- customReadFile _DB_PROGRAM_FILE_NAME
+    let programlinesOfFile = lines programContents
+    let programId = show (getProgramId program)
+    let programTitle = getProgramTitle program
+    let programSpecialityId = show (getProgramSpecialityId program)
+    let filteredLinesOfFile = filter (\line -> findLineById line (read programId :: Integer)) programlinesOfFile
+    let test = concat $ intersperse "\n" filteredLinesOfFile
+    customWriteFile _DB_PROGRAM_FILE_NAME _DB_PROGRAM_TEMP_FILE_NAME (test ++ "\n" ++ "Program " ++ programId ++ " \"" ++ programTitle ++ "\" " ++ programSpecialityId)
 
   createProgramList :: [String] -> [Program] -> [Program]
   createProgramList [] answer = answer

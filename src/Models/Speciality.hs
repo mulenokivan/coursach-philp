@@ -9,6 +9,7 @@ module Models.Speciality (
   getSpecialityTitle,
   getSpecialityCode,
   ifSpecialityFileExist,
+  updateSpeciality,
   printSpeciality
 ) where
   -- LIBRARIES
@@ -58,6 +59,17 @@ module Models.Speciality (
         deleteProgram program
       ) programList
     customWriteFile _DB_SPECIALITY_FILE_NAME _DB_SPECIALITY_TEMP_FILE_NAME test
+
+  updateSpeciality :: Speciality -> IO ()
+  updateSpeciality speciality = do
+    specialityContents <- customReadFile _DB_SPECIALITY_FILE_NAME
+    let specialitylinesOfFile = lines specialityContents
+    let specialityId = show (getSpecialityId speciality)
+    let specialityTitle = getSpecialityTitle speciality
+    let specialityCode = getSpecialityCode speciality
+    let filteredLinesOfFile = filter (\line -> findLineById line (read specialityId :: Integer)) specialitylinesOfFile
+    let test = concat $ intersperse "\n" filteredLinesOfFile
+    customWriteFile _DB_SPECIALITY_FILE_NAME _DB_SPECIALITY_TEMP_FILE_NAME (test ++ "\n" ++ "Speciality " ++ specialityId ++ " \"" ++ specialityTitle ++ "\" \"" ++ specialityCode ++ "\"")
 
   createSpecialityList :: [String] -> [Speciality] -> [Speciality]
   createSpecialityList [] answer = answer

@@ -9,6 +9,7 @@ module Models.Semester (
   getSemesterNumber,
   getSemesterProgramId,
   ifSemesterFileExist,
+  updateSemester,
   printSemester
 ) where
   -- LIBRARIES
@@ -57,6 +58,17 @@ module Models.Semester (
         deleteLoading loading
       ) loadingList
     customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME test
+
+  updateSemester :: Semester -> IO ()
+  updateSemester semester = do
+    semesterContents <- customReadFile _DB_SEMESTER_FILE_NAME
+    let semesterlinesOfFile = lines semesterContents
+    let semesterId = show (getSemesterId semester)
+    let semesterNumber = show (getSemesterNumber semester)
+    let semesterProgramId = show (getSemesterProgramId semester)
+    let filteredLinesOfFile = filter (\line -> findLineById line (read semesterId :: Integer)) semesterlinesOfFile
+    let test = concat $ intersperse "\n" filteredLinesOfFile
+    customWriteFile _DB_SEMESTER_FILE_NAME _DB_SEMESTER_TEMP_FILE_NAME (test ++ "\n" ++ "Semester " ++ semesterId ++ " " ++ semesterNumber ++ " " ++ semesterProgramId)
 
   createSemesterList :: [String] -> [Semester] -> [Semester]
   createSemesterList [] answer = answer

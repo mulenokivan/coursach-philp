@@ -38,7 +38,8 @@ module TBUI.Menus.SpecialityMenu (
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать направление подготовки, напишите: 'Create <название> <код>' ",
-      "Чтобы удалить направление подготовки, напишите: 'Delete <id>' "
+      "Чтобы удалить направление подготовки, напишите: 'Delete <id>' ",
+      "Чтобы обновить существующее направление подготовки, напишите: 'Update <id> <название> <код>' "
       ]
 
     input <- getLine
@@ -58,6 +59,14 @@ module TBUI.Menus.SpecialityMenu (
       let specialityTitle = getSpecialityTitle speciality
       deleteSpeciality speciality
       printSuccess ("Направление подготовки " ++ "\"" ++ specialityTitle ++ "\"" ++ " удалено")
+      specialityMenu
+    | (findSubStrIdx inputValue "Update" 0 /= Nothing) = do
+      let [_, idString, titleString, codeString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let speciality = findSpecialityById specialityList (read idString :: Integer)
+      let specialityTitle = getSpecialityTitle speciality
+      let updatedSpeciality = createLocalSpeciality (read idString :: Integer) titleString codeString
+      updateSpeciality updatedSpeciality
+      printSuccess ("Направление подготовки " ++ "\"" ++ specialityTitle ++ "\"" ++ " обновлено")
       specialityMenu
     | otherwise = do
       clearScreen

@@ -38,6 +38,7 @@ module TBUI.Menus.DisciplineMenu (
     printNoticeList [
       "Чтобы выйти в главное меню, напишите: 'Back'",
       "Чтобы создать учебный план, напишите: 'Create <название> <id учебного плана>' ",
+      "Чтобы обновить существующую дисциплину, напишите: 'Update <id> <название> <id учебного плана>' ",
       "Чтобы удалить дисциплину, напишите: 'Delete <id>' "
       ]
 
@@ -58,6 +59,14 @@ module TBUI.Menus.DisciplineMenu (
       let disciplineTitle = getDisciplineTitle discipline
       deleteDiscipline discipline
       printSuccess ("Дисциплина " ++ "\"" ++ disciplineTitle ++ "\"" ++ " удалена")
+      disciplineMenu
+    | (findSubStrIdx inputValue "Update" 0 /= Nothing) = do
+      let [_, idString, titleString, programIdString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
+      let discipline = findDisciplineById disciplineList (read idString :: Integer)
+      let disciplineTitle = getDisciplineTitle discipline
+      let updatedDiscipline = createLocalDiscipline (read idString :: Integer) titleString (read programIdString :: Integer)
+      updateDiscipline updatedDiscipline
+      printSuccess ("Дисциплина " ++ "\"" ++ disciplineTitle ++ "\"" ++ " обновлена")
       disciplineMenu
     | otherwise = do
       clearScreen

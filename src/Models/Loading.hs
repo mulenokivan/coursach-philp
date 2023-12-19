@@ -13,6 +13,7 @@ module Models.Loading (
   getLoadingKindAndHours,
   getLoadingSemesterIdAndDisciplineId,
   ifLoadingFileExist,
+  updateLoading,
   printLoading
 ) where
   -- LIBRARIES
@@ -56,6 +57,19 @@ module Models.Loading (
     let filteredLinesOfFile = filter (\line -> findLineById line (read loadingId :: Integer)) loadinglinesOfFile
     let test = concat $ intersperse "\n" filteredLinesOfFile
     customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME test
+
+  updateLoading :: Loading -> IO ()
+  updateLoading loading = do
+    loadingContents <- customReadFile _DB_LOADING_FILE_NAME
+    let loadinglinesOfFile = lines loadingContents
+    let loadingId = show (getLoadingId loading)
+    let loadingHours = show (getLoadingHours loading)
+    let loadingDisciplineId = show (getLoadingDisciplineId loading)
+    let loadingSemesterId = show (getLoadingSemesterId loading)
+    let loadingKind = getLoadingKind loading
+    let filteredLinesOfFile = filter (\line -> findLineById line (read loadingId :: Integer)) loadinglinesOfFile
+    let test = concat $ intersperse "\n" filteredLinesOfFile
+    customWriteFile _DB_LOADING_FILE_NAME _DB_LOADING_TEMP_FILE_NAME (test ++ "\n" ++ "Loading " ++ loadingId ++ " " ++ loadingHours ++ " " ++ loadingDisciplineId ++ " " ++ loadingSemesterId ++ " \"" ++ loadingKind ++ "\"")
 
   createLoadingList :: [String] -> [Loading] -> [Loading]
   createLoadingList [] answer = answer

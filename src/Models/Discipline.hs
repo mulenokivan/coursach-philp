@@ -9,7 +9,8 @@ module Models.Discipline (
   getDisciplineTitle,
   getDisciplineProgramId,
   ifDisciplineFileExist,
-  printDiscipline
+  printDiscipline,
+  updateDiscipline
 ) where
   -- LIBRARIES
   import System.Directory (doesFileExist)
@@ -57,6 +58,17 @@ module Models.Discipline (
         deleteLoading loading
       ) loadingList
     customWriteFile _DB_DISCIPLINE_FILE_NAME _DB_DISCIPLINE_TEMP_FILE_NAME test
+
+  updateDiscipline :: Discipline -> IO ()
+  updateDiscipline discipline = do
+    disciplineContents <- customReadFile _DB_DISCIPLINE_FILE_NAME
+    let disciplinelinesOfFile = lines disciplineContents
+    let disciplineId = show (getDisciplineId discipline)
+    let disciplineTitle = getDisciplineTitle discipline
+    let disciplineProgramId = show (getDisciplineProgramId discipline)
+    let filteredLinesOfFile = filter (\line -> findLineById line (read disciplineId :: Integer)) disciplinelinesOfFile
+    let test = concat $ intersperse "\n" filteredLinesOfFile
+    customWriteFile _DB_DISCIPLINE_FILE_NAME _DB_DISCIPLINE_TEMP_FILE_NAME (test ++ "\n" ++ "Discipline " ++ disciplineId ++ " \"" ++ disciplineTitle ++ "\" " ++ disciplineProgramId)
 
   createDisciplineList :: [String] -> [Discipline] -> [Discipline]
   createDisciplineList [] answer = answer
