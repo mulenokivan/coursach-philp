@@ -52,6 +52,7 @@ module TBUI.Menus.SpecialityMenu (
     | (findSubStrIdx inputValue "Create" 0 /= Nothing) = do
       let [_, titleString, codeString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
       createSpeciality titleString codeString
+      printSuccess ("Направление подготовки " ++ "\"" ++ titleString ++ "\"" ++ " создано")
       specialityMenu
     | (findSubStrIdx inputValue "Delete" 0 /= Nothing) = do
       let [_, idString] = reverseArray (removeQuotesFromArray (splitOnQuotes inputValue [] []))
